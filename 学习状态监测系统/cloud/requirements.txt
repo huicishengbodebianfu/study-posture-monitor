@@ -1,0 +1,36 @@
+# 学习状态监测系统 · 阶段一 云端依赖
+# 安装：pip install -r requirements.txt
+#
+# ⚠️ 版本策略说明（交接必读）
+#
+# 本文件原本全部用 >= 下限约束。实际部署在 Ubuntu 24.04 + Python 3.12 上
+# 装出来的版本比原文档预期新了一个大版本（OpenCV 4.x → 5.0，numpy 1.x → 2.x），
+# 而项目代码是在 OpenCV 4 / numpy 1 时代写的。
+#
+# 实测结论：当前这套组合能跑通（OpenCV 5.0 的 imdecode/imencode/resize/cvtColor
+# 均可正常工作），所以下面把实测过的版本钉死，保证重建时不会装出别的组合。
+#
+# 如果将来需要升级，请先在测试环境验证：
+#   - cv2.imdecode / imencode / resize / cvtColor 行为是否变化
+#   - numpy 标量转 JSON 是否仍然需要显式 float()（见 posture.py 的注释）
+#
+# 完整依赖树（含间接依赖）见 备份/cloud_env/pip_freeze.txt
+
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+python-multipart==0.0.32
+openvino==2026.4.0
+opencv-python-headless==5.0.0.93
+numpy==2.5.3
+pillow==12.3.0
+
+# 多态检测（多个 AI API 分开工作）· 可选增强层
+# Qwen-VL / DeepSeek 均通过 HTTP 调用，仅需 requests
+requests==2.34.2
+
+# ---------------------------------------------------------------------------
+# 注意：导出 OpenVINO 模型需要额外装 ultralytics（会拖入约 2GB 的 torch + CUDA）。
+# 那只在"导出模型"这一步需要，且应在临时 venv 里做，导出后立刻删除。
+# 云端运行时不需要 ultralytics / torch，所以不写在这里。
+# 模型已随备份提供（备份/model/），正常情况下无需重新导出。
+# ---------------------------------------------------------------------------

@@ -1,0 +1,66 @@
+# 真实配置与密钥（绝不要提交）
+.env
+*.pem          # 私钥文件（本仓库从未收录）
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+*.ppk
+credentials*
+.secrets/
+*_key
+*_key.pub
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# 编译产物 / 固件二进制（不随源码发布）
+*.bin
+*.elf
+*.map
+*.o
+*.d
+*.dex
+*.class
+*.apk
+build/
+.build/
+.build.archive/
+*.exe
+
+# 抓图 / 照片 / 隐私图像（本仓库不收录）
+images/raw/
+images/test/
+images/extra/
+images/sheets/
+data/captures*/
+results/*.jsonl
+*.jpg
+*.jpeg
+!**/接线图*.png
+!**/接线图*.svg
+!**/接线细节*.png
+!**/接线细节*.svg
+
+# 大体积评估中间数据与交付归档
+*.zip
+*.7z
+*.pdf
+*.xlsx
+*.csv
+!**/partitions.csv
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.bak
+*.p3bak

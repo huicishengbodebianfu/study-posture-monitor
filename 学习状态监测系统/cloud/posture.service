@@ -1,0 +1,49 @@
+# posture.service — 学习状态监测系统 · 阶段一 云端服务 systemd 单元
+#
+# ⚠️ 本文件已修正。原始版本有两个致命问题，会导致服务无法启动或配置不生效：
+#
+#   1. 原版写 User=posture / Group=posture，但项目中从未有任何步骤创建这个
+#      系统用户 → systemd 报 "Failed to determine user credentials"，
+#      服务直接启动失败。现改为 root。
+#
+#   2. 原版只有硬编码的 Environment= 行，没有 EnvironmentFile，
+#      导致 cloud/.env 文件根本不被读取 —— 改 .env 无效，
+#      密钥和标定阈值永远用不上。现增加 EnvironmentFile=/opt/posture/.env。
+#
+# 部署步骤：
+#   1. 将本项目 cloud/ 下的文件放到 /opt/posture/
+#   2. cp .env.example .env 并按需修改（至少改 DEVICE_KEY）
+#   3. 复制本文件到 /etc/systemd/system/posture.service
+#   4. sudo systemctl daemon-reload
+#   5. sudo systemctl enable --now posture
+#   6. sudo systemctl status posture
+
+[Unit]
+Description=Posture Monitor Cloud Service (Stage 1)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/posture
+
+# 唯一的配置来源：/opt/posture/.env
+# 阈值、密钥、模型路径全部从这里读，不再硬编码在单元文件里
+EnvironmentFile=/opt/posture/.env
+
+# 启动命令：监听 0.0.0.0:8000
+# --workers 1 是必须的：规则引擎的"连续 2 帧"计数保存在进程内存，
+# 多 worker 会各算各的，导致触发逻辑失效
+ExecStart=/opt/posture/venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000 --workers 1
+
+Restart=always
+RestartSec=3
+
+# 日志
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=posture
+
+[Install]
+WantedBy=multi-user.target

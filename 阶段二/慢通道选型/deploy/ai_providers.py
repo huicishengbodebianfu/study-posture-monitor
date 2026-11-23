@@ -22,9 +22,8 @@ from __future__ import annotations
 import base64
 import json
 import logging
-import time
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 import requests
 
@@ -88,11 +87,9 @@ class BehaviorDecision:
 # 多态状态枚举：唯一事实源在 schema.py，此处只做再导出。
 # 不要在本文件另建一份枚举——两份枚举迟早漂移（验收清单第 1 条）。
 from schema import (  # noqa: E402
-    ALERTABLE_STATES,
     VALID_STATES,
     extract_json,
     normalize,
-    should_alert,
 )
 
 

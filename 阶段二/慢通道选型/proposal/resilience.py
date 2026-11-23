@@ -21,8 +21,8 @@ import random
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, wait
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 import requests
 
@@ -475,7 +475,6 @@ class VisionPool:
             "badcase": path, "latency": round(time.time() - t_start, 2),
         }
 
-
     # ---------------------------------------------------------------- 并发模式
     def _call_one(self, be: "Backend", data_url: str, prompt: str, image_bytes: bytes) -> dict:
         """对单个后端发一次请求，返回结构化结果（不抛异常）。"""
@@ -632,6 +631,7 @@ class VisionPool:
             "attempts": len(results), "error": "", "badcase": "",
             "latency": round(time.time() - t0, 2),
         }
+
     # ---------------------------------------------------------------- 内部
     def _backoff(self, round_i: int) -> None:
         delay = min(self.backoff_cap, self.backoff_base * (2 ** round_i))
@@ -660,6 +660,7 @@ TINY_JPEG = (
     "HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAA"
     "AAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q=="
 )
+
 
 # ---------------------------------------------------------------- 并发投票辅助
 def _extract_json(text: str):

@@ -169,8 +169,10 @@ def confusion(upright_hh: np.ndarray, slouch_hh: np.ndarray,
         "up_total": up_total, "sl_total": sl_total,
         "fpr": (fp / up_total) if up_total else float("nan"),
         "fnr": (fn / sl_total) if sl_total else float("nan"),
-        "acc": ((tp + tn) / (up_total + sl_total))
-               if (up_total + sl_total) else float("nan"),
+        "acc": (
+            ((tp + tn) / (up_total + sl_total))
+            if (up_total + sl_total) else float("nan")
+        ),
     }
 
 

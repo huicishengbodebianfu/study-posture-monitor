@@ -22,9 +22,8 @@ from __future__ import annotations
 import base64
 import json
 import logging
-import time
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 import requests
 

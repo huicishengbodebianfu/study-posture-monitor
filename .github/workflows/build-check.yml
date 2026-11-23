@@ -1,0 +1,63 @@
+name: 构建检查
+
+# 验证 Python 云端代码可编译、风格合规，以及固件配置占位符一致。
+# 不编译 Arduino 固件（需 ESP32 核心与 PSRAM 板支持，见 CONTRIBUTING 本地指引）。
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 设置 Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装 flake8
+        run: pip install flake8
+
+      - name: Python 语法检查
+        run: |
+          python -m compileall -q \
+            学习状态监测系统/cloud \
+            学习状态监测系统/tools \
+            阶段二/server-sync \
+            阶段二/慢通道选型/deploy \
+            阶段二/慢通道选型/proposal \
+            阶段二/慢通道选型/tools \
+            阶段二/真机采集包
+
+      - name: 风格检查 (flake8)
+        run: |
+          # 依赖仓库根目录的 .flake8 配置（含 per-file-ignores 与 exclude）
+          flake8
+
+  firmware-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 固件与云端占位符一致性
+        run: |
+          # 固件 config.h 与云端 .env.example 的 DEVICE_KEY 必须使用同一占位符
+          FIRMWARE_KEY=$(grep -oP 'DEVICE_KEY\s*"\K[^"]+' 学习状态监测系统/firmware/config.h)
+          ENV_KEY=$(grep -oP '^DEVICE_KEY=\K.*' 学习状态监测系统/cloud/.env.example)
+          if [ "$FIRMWARE_KEY" != "$ENV_KEY" ]; then
+            echo "::error::DEVICE_KEY 占位符不一致: firmware=$FIRMWARE_KEY env=$ENV_KEY"
+            exit 1
+          fi
+          echo "✅ DEVICE_KEY 占位符一致: $FIRMWARE_KEY"
+
+          # 确保没有真实值残留
+          if grep -qE '239f9e115dded0864ff656d5e91dd128|cthy10121|9pimr84b' \
+               学习状态监测系统/firmware/config.h 阶段二/firmware/main/config.h; then
+            echo "::error::固件 config.h 含真实凭据"
+            exit 1
+          fi
+          echo "✅ 固件配置已脱敏"

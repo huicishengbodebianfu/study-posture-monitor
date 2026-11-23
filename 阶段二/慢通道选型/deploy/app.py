@@ -375,7 +375,7 @@ async def detect(request: Request, x_device_key: str = Header(default="")):
         # 注意：两个方向都检不到人时**不能**锁定方向——旧实现会锁成 False，
         # 之后所有倒置帧都会被错误地按正向处理（实测导致端正帧 hh=-0.32）。
         cur_rot = _flip_hint is True
-        blob, scale, pad_x, pad_y, ow, oh, stats = preprocess(body, rotate180=cur_rot)
+        blob, scale, pad_x, pad_y, ow, _oh, stats = preprocess(body, rotate180=cur_rot)
         keypoints, kp_conf = infer(blob)
         used_flip = cur_rot
         _hh = _raw_hh(keypoints)
@@ -388,7 +388,7 @@ async def detect(request: Request, x_device_key: str = Header(default="")):
             hh2 = _raw_hh(kp2)
             _better = (kp2 is not None) and (hh2 is None or _hh is None or hh2 > _hh)
             if _better:
-                blob, scale, pad_x, pad_y, ow, oh, stats = b2, s2, px2, py2, ow2, oh2, st2
+                blob, scale, pad_x, pad_y, ow, _oh, stats = b2, s2, px2, py2, ow2, oh2, st2  # noqa: F841
                 keypoints, kp_conf = kp2, cf2
                 used_flip = alt_rot
                 _flip_hint = alt_rot
@@ -536,11 +536,3 @@ def on_startup():
         load_model()
     except Exception as e:
         log.error("model preload failed (will retry on first request): %s", e)
-
-
-
-
-
-
-
-

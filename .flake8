@@ -1,0 +1,17 @@
+[flake8]
+# 核心模块才做风格检查；proposal/ 与 tools/ 是内部评估/抓取脚本，风格暂不卡 CI
+max-line-length = 120
+extend-ignore = E203, W503, E501
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    阶段二/慢通道选型/tools,
+    阶段二/慢通道选型/proposal,
+    阶段二/真机采集包
+
+# 内部 eval 脚本（proposal/）与抓取脚本（tools/）允许更宽松的行宽
+per-file-ignores =
+    阶段二/慢通道选型/tools/*.py:E501
+    阶段二/慢通道选型/proposal/*.py:E501
